@@ -7,6 +7,7 @@
  *
  * Read more about Tambo at https://tambo.co/docs
  */
+import RiskAlertPanel from "@/components/risk-alert-panel";
 
 import WeeklyFocusBoard from "@/components/weekly-focus-board";
 import { demoFocusItems } from "@/lib/demo-data";
@@ -128,6 +129,24 @@ export const components: TamboComponent[] = [
           id: z.string(),
           title: z.string(),
           done: z.boolean().optional(),
+        })
+      )
+      .optional(),
+  }),
+},
+{
+  name: "RiskAlertPanel",
+  description:
+    "Highlights overdue or high-risk items. Use when the user asks what they are missing, what could cause trouble, overdue tasks, or risks this week or month. Call get-deadlines and get-focus-items to identify risks.",
+  component: RiskAlertPanel,
+  propsSchema: z.object({
+    title: z.string().optional(),
+    risks: z
+      .array(
+        z.object({
+          id: z.string(),
+          title: z.string(),
+          reason: z.string(),
         })
       )
       .optional(),
