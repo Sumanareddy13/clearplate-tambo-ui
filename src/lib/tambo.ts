@@ -7,14 +7,15 @@
  *
  * Read more about Tambo at https://tambo.co/docs
  */
+
+import WeeklyFocusBoard from "@/components/weekly-focus-board";
+import { demoFocusItems } from "@/lib/demo-data";
+
 import { demoDeadlines } from "@/lib/demo-data";
 import DeadlineTimeline from "@/components/deadline-timeline";
 import { Graph, graphSchema } from "@/components/tambo/graph";
 import { DataCard, dataCardSchema } from "@/components/ui/card-data";
-import {
-  getCountryPopulations,
-  getGlobalPopulationTrend,
-} from "@/services/population-stats";
+
 import type { TamboComponent } from "@tambo-ai/react";
 import { TamboTool } from "@tambo-ai/react";
 import { z } from "zod";
@@ -28,35 +29,7 @@ import { z } from "zod";
  */
 
 export const tools: TamboTool[] = [
-  {
-    name: "countryPopulation",
-    description:
-      "A tool to get population statistics by country with advanced filtering options",
-    tool: getCountryPopulations,
-    inputSchema: z.object({
-      continent: z.string().optional(),
-      sortBy: z.enum(["population", "growthRate"]).optional(),
-      limit: z.number().optional(),
-      order: z.enum(["asc", "desc"]).optional(),
-    }),
-    outputSchema: z.array(
-      z.object({
-        countryCode: z.string(),
-        countryName: z.string(),
-        continent: z.enum([
-          "Asia",
-          "Africa",
-          "Europe",
-          "North America",
-          "South America",
-          "Oceania",
-        ]),
-        population: z.number(),
-        year: z.number(),
-        growthRate: z.number(),
-      }),
-    ),
-  },
+
   {
   name: "get-deadlines",
   description:
@@ -72,23 +45,22 @@ export const tools: TamboTool[] = [
     })
   ),
 },
-  {
-    name: "globalPopulation",
-    description:
-      "A tool to get global population trends with optional year range filtering",
-    tool: getGlobalPopulationTrend,
-    inputSchema: z.object({
-      startYear: z.number().optional(),
-      endYear: z.number().optional(),
-    }),
-    outputSchema: z.array(
-      z.object({
-        year: z.number(),
-        population: z.number(),
-        growthRate: z.number(),
-      }),
-    ),
-  },
+{
+  name: "get-focus-items",
+  description:
+    "Returns the user's weekly focus items split into this week and next week. Use this before rendering a weekly focus board or answering what to focus on.",
+  tool: () => demoFocusItems,
+  inputSchema: z.object({}),
+  outputSchema: z.array(
+    z.object({
+      id: z.string(),
+      title: z.string(),
+      bucket: z.enum(["thisWeek", "nextWeek"]),
+      done: z.boolean().optional(),
+    })
+  ),
+},
+  
   // Add more tools here
 ];
 
@@ -129,6 +101,33 @@ export const components: TamboComponent[] = [
           title: z.string(),
           date: z.string(),
           severity: z.enum(["low", "medium", "high"]).optional(),
+        })
+      )
+      .optional(),
+  }),
+},
+{
+  name: "WeeklyFocusBoard",
+  description:
+    "Shows a weekly focus board with two columns: This Week and Next Week. Always call `get-focus-items` before rendering. Use when user asks what to focus on this week, plan the week, prioritize tasks, or move items between weeks.",
+  component: WeeklyFocusBoard,
+  propsSchema: z.object({
+    weekLabel: z.string().optional(),
+    thisWeekItems: z
+      .array(
+        z.object({
+          id: z.string(),
+          title: z.string(),
+          done: z.boolean().optional(),
+        })
+      )
+      .optional(),
+    nextWeekItems: z
+      .array(
+        z.object({
+          id: z.string(),
+          title: z.string(),
+          done: z.boolean().optional(),
         })
       )
       .optional(),
