@@ -25,8 +25,7 @@ export default function ClearPlateDashboard() {
                   ClearPlate
                 </div>
                 <div className="text-xs text-gray-500">
-                  Control your week with natural language — focus, deadlines, and
-                  risks.
+                  Your plate is full. Tell ClearPlate what is going on - it turns chaos into a plan, you can talk to your to-dos.
                 </div>
               </div>
             </div>
