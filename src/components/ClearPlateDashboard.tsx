@@ -11,7 +11,6 @@ export default function ClearPlateDashboard() {
       components={components}
       tools={tools}
       tamboUrl={process.env.NEXT_PUBLIC_TAMBO_URL}
-      // ✅ No MCP in a public demo
     >
       <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white">
         <header className="sticky top-0 z-10 border-b bg-white/70 backdrop-blur">
