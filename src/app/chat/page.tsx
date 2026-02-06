@@ -2,6 +2,6 @@
 
 import ClearPlateDashboard from "@/components/ClearPlateDashboard";
 
-export default function Home() {
+export default function ChatPage() {
   return <ClearPlateDashboard />;
 }
