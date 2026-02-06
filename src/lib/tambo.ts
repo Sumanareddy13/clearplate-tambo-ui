@@ -11,6 +11,7 @@ import RiskAlertPanel from "@/components/risk-alert-panel";
 
 import WeeklyFocusBoard from "@/components/weekly-focus-board";
 import { demoFocusItems } from "@/lib/demo-data";
+import { loadFocusItems, saveFocusItems } from "@/lib/storage";
 
 import { demoDeadlines } from "@/lib/demo-data";
 import DeadlineTimeline from "@/components/deadline-timeline";
@@ -61,6 +62,40 @@ export const tools: TamboTool[] = [
     })
   ),
 },
+{
+  name: "update-focus-item",
+  description:
+    "Use get-focus-items to find the correct item id from title before updating.",
+  tool: ({ id, bucket, done, title }: { id: string; bucket?: "thisWeek" | "nextWeek"; done?: boolean; title?: string }) => {
+    const items = loadFocusItems();
+    const updated = items.map((it) => {
+      if (it.id !== id) return it;
+      return {
+        ...it,
+        bucket: bucket ?? it.bucket,
+        done: done ?? it.done,
+        title: title ?? it.title,
+      };
+    });
+    saveFocusItems(updated);
+    return updated;
+  },
+  inputSchema: z.object({
+    id: z.string().describe("The id of the focus item to update"),
+    bucket: z.enum(["thisWeek", "nextWeek"]).optional().describe("Move item to thisWeek or nextWeek"),
+    done: z.boolean().optional().describe("Mark item done or not done"),
+    title: z.string().optional().describe("Rename the item title"),
+  }),
+  outputSchema: z.array(
+    z.object({
+      id: z.string(),
+      title: z.string(),
+      bucket: z.enum(["thisWeek", "nextWeek"]),
+      done: z.boolean().optional(),
+    })
+  ),
+},
+
   
   // Add more tools here
 ];

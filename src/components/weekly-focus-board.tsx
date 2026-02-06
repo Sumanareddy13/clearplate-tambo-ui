@@ -1,22 +1,58 @@
 "use client";
 
-type FocusItem = {
-  id: string;
-  title: string;
-  done?: boolean;
-};
+import { useEffect, useMemo, useState } from "react";
+import {
+  loadFocusItems,
+  saveFocusItems,
+  resetFocusItems,
+  type FocusItem,
+} from "@/lib/storage";
 
 type WeeklyFocusBoardProps = {
-  weekLabel?: string; // e.g. "Feb 3 – Feb 9"
-  thisWeekItems?: FocusItem[];
-  nextWeekItems?: FocusItem[];
+  weekLabel?: string;
+  items?: FocusItem[]; // optional seed from Tambo; we'll persist it
 };
 
 export default function WeeklyFocusBoard({
   weekLabel = "This Week",
-  thisWeekItems = [],
-  nextWeekItems = [],
+  items,
 }: WeeklyFocusBoardProps) {
+  const [focusItems, setFocusItems] = useState<FocusItem[]>([]);
+  const [hasMounted, setHasMounted] = useState(false);
+
+  // 1) On mount: load from localStorage (or demo seed)
+  useEffect(() => {
+    const loaded = loadFocusItems();
+    setFocusItems(loaded);
+    setHasMounted(true);
+  }, []);
+
+  // 2) If Tambo sends items (first render), overwrite storage + UI
+  // Keep it simple: if 'items' exists, we treat it as the latest plan.
+  useEffect(() => {
+    if (!hasMounted) return;
+    if (!items || items.length === 0) return;
+
+    saveFocusItems(items);
+    setFocusItems(items);
+  }, [hasMounted, items]);
+
+  const thisWeekItems = useMemo(
+    () => focusItems.filter((i) => i.bucket === "thisWeek"),
+    [focusItems],
+  );
+
+  const nextWeekItems = useMemo(
+    () => focusItems.filter((i) => i.bucket === "nextWeek"),
+    [focusItems],
+  );
+
+  const handleReset = () => {
+    resetFocusItems();
+    const loaded = loadFocusItems();
+    setFocusItems(loaded);
+  };
+
   return (
     <div className="bg-white rounded-xl border p-4 w-full max-w-3xl">
       <div className="flex items-start justify-between gap-3 mb-4">
@@ -24,7 +60,17 @@ export default function WeeklyFocusBoard({
           <h2 className="text-lg font-semibold">Weekly Focus Board</h2>
           <p className="text-sm text-gray-500">{weekLabel}</p>
         </div>
-        <div className="text-xs text-gray-400">ClearPlate</div>
+
+        <div className="flex items-center gap-2">
+          <button
+            onClick={handleReset}
+            className="text-xs px-3 py-1 rounded-md border bg-white hover:bg-gray-50"
+            type="button"
+          >
+            Reset demo
+          </button>
+          <div className="text-xs text-gray-400">ClearPlate</div>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -43,10 +89,16 @@ export default function WeeklyFocusBoard({
                 >
                   <div className="flex items-center gap-2">
                     <input type="checkbox" checked={!!item.done} readOnly />
-                    <span className={item.done ? "line-through text-gray-400" : ""}>
+                    <span
+                      className={item.done ? "line-through text-gray-400" : ""}
+                      title={`id: ${item.id}`}
+                    >
                       {item.title}
                     </span>
                   </div>
+
+                  {/* Tiny id tag helps Tambo reference items more reliably */}
+                  <span className="text-[10px] text-gray-400">{item.id}</span>
                 </li>
               ))}
             </ul>
@@ -68,16 +120,26 @@ export default function WeeklyFocusBoard({
                 >
                   <div className="flex items-center gap-2">
                     <input type="checkbox" checked={!!item.done} readOnly />
-                    <span className={item.done ? "line-through text-gray-400" : ""}>
+                    <span
+                      className={item.done ? "line-through text-gray-400" : ""}
+                      title={`id: ${item.id}`}
+                    >
                       {item.title}
                     </span>
                   </div>
+
+                  <span className="text-[10px] text-gray-400">{item.id}</span>
                 </li>
               ))}
             </ul>
           )}
         </div>
       </div>
+
+      <p className="text-xs text-gray-400 mt-3">
+        Tip: Try “Move cancel trial subscription to next week” or “Mark meal prep
+        as done”.
+      </p>
     </div>
   );
 }
