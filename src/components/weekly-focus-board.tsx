@@ -10,7 +10,7 @@ import {
 
 type WeeklyFocusBoardProps = {
   weekLabel?: string;
-  items?: FocusItem[]; // optional seed from Tambo; we'll persist it
+  items?: FocusItem[];
 };
 
 export default function WeeklyFocusBoard({
@@ -20,15 +20,13 @@ export default function WeeklyFocusBoard({
   const [focusItems, setFocusItems] = useState<FocusItem[]>([]);
   const [hasMounted, setHasMounted] = useState(false);
 
-  // 1) On mount: load from localStorage (or demo seed)
   useEffect(() => {
     const loaded = loadFocusItems();
     setFocusItems(loaded);
     setHasMounted(true);
   }, []);
 
-  // 2) If Tambo sends items (first render), overwrite storage + UI
-  // Keep it simple: if 'items' exists, we treat it as the latest plan.
+
   useEffect(() => {
     if (!hasMounted) return;
     if (!items || items.length === 0) return;

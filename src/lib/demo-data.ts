@@ -47,10 +47,6 @@ export const demoFocusItems: FocusItem[] = [
   { id: "f5", title: "Plan weekend errands", bucket: "nextWeek", done: false },
 ];
 
-// --------------------
-// Money demo data (NEW)
-// --------------------
-
 export type MoneyItem = {
   id: string;
   name: string;

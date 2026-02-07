@@ -4,18 +4,16 @@ import type { MoneyItem } from "@/lib/demo-data";
 
 type MoneySnapshotProps = {
   title?: string;
-  rangeLabel?: string; // e.g. "Next 30 days"
+  rangeLabel?: string; 
   totalUsd?: number;
   items?: MoneyItem[];
 };
 
 function formatMoney(amount: number) {
-  // keep it simple: demo-only formatting
   return `$${amount.toFixed(amount % 1 === 0 ? 0 : 2)}`;
 }
 
 function formatDate(dateStr: string) {
-  // input: YYYY-MM-DD
   const [y, m, d] = dateStr.split("-").map((x) => Number(x));
   if (!y || !m || !d) return dateStr;
   const dt = new Date(y, m - 1, d);

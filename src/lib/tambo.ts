@@ -39,7 +39,6 @@ export const tools: TamboTool[] = [
     description:
       "Returns the user's weekly focus items (from local storage). Use this before rendering a weekly focus board or answering what to focus on.",
     tool: () => {
-      // Read the current state so Tambo is consistent across turns
       return loadFocusItems();
     },
     inputSchema: z.object({}),
@@ -100,9 +99,6 @@ export const tools: TamboTool[] = [
     ),
   },
 
-  // --------------------
-  // Money tools
-  // --------------------
   {
     name: "get-money-items",
     description:
